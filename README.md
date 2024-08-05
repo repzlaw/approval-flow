@@ -37,4 +37,6 @@ This is a Laravel-based project that implements an approval workflow system usin
     ```sh
     php artisan serve
     ```
-    
+
+## Usage
+    Edit or Create a user and then approve or reject the request.
