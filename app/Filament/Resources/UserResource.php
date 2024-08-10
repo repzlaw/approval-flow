@@ -36,7 +36,15 @@ class UserResource extends Resource
                     ->required(fn (Page $livewire) => $livewire instanceof Pages\CreateUser)
                     // ->visible(fn (Page $livewire) => $livewire instanceof Pages\CreateUser)
                     ->maxLength(255)
-                    ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
+                    ->dehydrateStateUsing(function ($state, $livewire) {
+                        // Check if the page is for editing and if the state is empty
+                        if ($livewire instanceof Pages\EditUser && !$state) {
+                            // Retrieve the existing password from the model
+                            return $livewire->record->password;
+                        }
+                        // Hash the password if a new one is provided
+                        return $state ? bcrypt($state) : null;
+                    })
             ]);
     }
 
