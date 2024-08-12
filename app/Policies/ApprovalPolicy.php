@@ -105,4 +105,9 @@ class ApprovalPolicy
     {
         return $user->can('reorder_approval');
     }
+
+    public function approve(User $user)
+    {
+        return $user->can('approve_approval');
+    } 
 }

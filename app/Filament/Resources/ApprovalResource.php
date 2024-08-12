@@ -16,22 +16,36 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\KeyValueEntry;
 use App\Filament\Resources\ApprovalResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ApprovalResource\RelationManagers;
-use Filament\Infolists\Components\KeyValueEntry;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
-class ApprovalResource extends Resource
+class ApprovalResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Approval::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+            'approve'
+        ];
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('data'),
+                // Tables\Columns\TextColumn::make('data'),
                 Tables\Columns\TextColumn::make('approvable_type')
                     ->label('Model'),
                 Tables\Columns\TextColumn::make('operation'),
@@ -46,6 +60,9 @@ class ApprovalResource extends Resource
                     ->numeric()
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
@@ -57,7 +74,7 @@ class ApprovalResource extends Resource
                                 ->label('Approver Comment')
                         ])
                         ->visible(function ($record) {
-                            return ($record->status === (ApprovalStatus::SUBMITTED) || $record->status === (ApprovalStatus::REJECTED));
+                            return ($record->status === ApprovalStatus::SUBMITTED || $record->status === ApprovalStatus::REJECTED);
                         })
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -80,7 +97,7 @@ class ApprovalResource extends Resource
                         ->requiresConfirmation()
                         ->modalSubmitActionLabel('Reject')
                         ->visible(function ($record) {
-                            return ($record->status === (ApprovalStatus::SUBMITTED));
+                            return ($record->status === ApprovalStatus::SUBMITTED);
                         })
                         ->action(function (Approval $record, array $data) {
                             $record->reject($data);
@@ -91,9 +108,9 @@ class ApprovalResource extends Resource
                         }),
 
                 ])
-                // ->visible(function () use($user) {
-                //     return $user->hasTeamPermission($user->currentTeam, 'team:update');
-                // }),
+                ->visible(function () {
+                    return auth()->user()->can('approve_approval');
+                }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -101,7 +118,14 @@ class ApprovalResource extends Resource
                 ]),
             ])
             ->recordAction(Tables\Actions\ViewAction::class) 
-            ->recordUrl(null);
+            ->recordUrl(null)
+            ->modifyQueryUsing(function (Builder $query) {
+                if (auth()->user()->can('approve_approval')) {
+                    return $query;
+                } else {
+                    return $query->where('user_id', auth()->user()->id);
+                }
+            });
     }
 
     public static function infolist(Infolist $infolist): Infolist
@@ -115,7 +139,14 @@ class ApprovalResource extends Resource
                             ->columnSpan(3)
                             ->columns(2)
                             ->schema([
-                                KeyValueEntry::make('data')
+                                KeyValueEntry::make('data.new')
+                                    ->label('New Data')
+                                    ->columnSpan(2),
+                                KeyValueEntry::make('data.old')
+                                    ->label('Old Data')
+                                    ->visible(function ($record) {
+                                        return $record->operation === 'Edit';
+                                    })
                                     ->columnSpan(2),
                                 TextEntry::make('approvable_type')
                                     ->label('Model'),

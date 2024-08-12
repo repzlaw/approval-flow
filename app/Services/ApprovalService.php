@@ -39,7 +39,7 @@ class ApprovalService
 
         // Create a new record with the provided data
         $model = new $modelClass;
-        $model->fill($this->data);
+        $model->fill($this->data['new']);
         $model->save();
 
         return $model;
@@ -62,7 +62,7 @@ class ApprovalService
         }
 
         // Update the record with the provided data
-        $model->update($this->data);
+        $model->update($this->data['new']);
 
         return true;
     }
