@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 
 trait ApprovalFlow
 {
+    protected $noApprovalRequired = false;
+
     protected function handleRecordCreation(array $data): Model
     {
         if (auth()->user()->can('approve_approval')) {
@@ -37,11 +39,15 @@ trait ApprovalFlow
             return $record;
         }
 
+        $approvable = [];
         $original = $record->getOriginal();
-        $reflector = new ReflectionClass($record);
-        $property = $reflector->getProperty('approvable');
-        $property->setAccessible(true);
-        $approvable = $property->getValue($record);
+
+        if (property_exists($record, 'approvable')) {
+            $reflector = new ReflectionClass($record);
+            $property  = $reflector->getProperty('approvable');
+            $property->setAccessible(true);
+            $approvable = $property->getValue($record);
+        }
 
         $oldData = [];
         $newData = [];
@@ -49,7 +55,7 @@ trait ApprovalFlow
 
         foreach ($data as $key => $value) {
             if (isset($original[$key]) && $original[$key] != $value) {
-                if (!in_array($key, $approvable)) {
+                if (in_array($key, $approvable)) {
                     $approvableData[$key] = $value;
                 } else {
                     $oldData[$key] = $original[$key];
@@ -80,6 +86,8 @@ trait ApprovalFlow
                     'data' => $array,
                 ]
             );
+        } else {
+            $this->noApprovalRequired = true;
         }
 
         return $record;
@@ -87,7 +95,7 @@ trait ApprovalFlow
 
     protected function getCreatedNotificationTitle(): ?string
     {
-        if (auth()->user()->can('approve_approval')) {
+        if (auth()->user()->can('approve_approval') || $this->noApprovalRequired) {
             return 'Successful';
         }
         return 'Awaiting Admin Approval';
@@ -95,7 +103,7 @@ trait ApprovalFlow
 
     protected function getSavedNotificationTitle(): ?string
     {
-        if (auth()->user()->can('approve_approval')) {
+        if (auth()->user()->can('approve_approval') || $this->noApprovalRequired) {
             return 'Successful';
         }
         return 'Awaiting Admin Approval';
