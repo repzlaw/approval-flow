@@ -38,7 +38,7 @@ This is a Laravel-based project that implements an approval workflow system usin
     php artisan serve
     ```
 
-6. Add approvable property to the your models to determine which fields would require approval:
+6. Add $approvable property to your models to determine which fields would not require approval:
     ```sh
     protected $approvable = [
         'email',
@@ -50,7 +50,12 @@ This is a Laravel-based project that implements an approval workflow system usin
     use ApprovalFlow;
     ```
 
-8. Give approve permission to roles or users than can approve requests:
+8. Give approve permission to roles or users than can approve requests.
+
+9. Add $approvable_related_column property to your models to determine which field alongside the ID would be shown as related record:
+    ```sh
+    protected $approvable_related_column = 'name';
+    ```
 
 ## Usage
     Edit or Create a user and then approve or reject the request.
