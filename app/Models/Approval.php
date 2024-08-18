@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\ApprovalStatus;
 use App\Services\ApprovalService;
+use App\Mail\ApprovalRequestStatus;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,7 +38,7 @@ class Approval extends Model
     public function approve(array $data): void
     {
         $approvalService = new ApprovalService($this);
-        $result = $approvalService->index();
+        $approvalService->index();
 
         $this->status           = ApprovalStatus::APPROVED;
         $this->approver_id      = auth()->id();
@@ -54,6 +56,8 @@ class Approval extends Model
         $this->approver_comment = $data['approver_comment'];
 
         $this->save();
+
+        Mail::to($this->user)->send(new ApprovalRequestStatus($data['approver_comment'], 'Rejected'));
     }
 
     protected function editRecord(array $data)
