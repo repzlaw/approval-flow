@@ -30,6 +30,7 @@ class User extends Authenticatable implements FilamentUser
         'email',
     ];
 
+    protected $approvable_related_column = 'name';
 
     /**
      * The attributes that should be hidden for serialization.

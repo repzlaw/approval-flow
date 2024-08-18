@@ -47,7 +47,10 @@ class ApprovalResource extends Resource implements HasShieldPermissions
             ->columns([
                 // Tables\Columns\TextColumn::make('data'),
                 Tables\Columns\TextColumn::make('approvable_type')
-                    ->label('Model'),
+                    ->label('Resource')
+                    ->formatStateUsing(function ($state) {
+                        return class_basename($state);
+                    }),
                 Tables\Columns\TextColumn::make('operation'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -132,6 +135,48 @@ class ApprovalResource extends Resource implements HasShieldPermissions
     {
         return $infolist
             ->schema([
+                Section::make('Related Record')
+                    ->columns(2)
+                    ->schema([
+                        TextEntry::make('approvable_id')
+                            ->label('Record ID'),
+                        TextEntry::make('approvable_type')
+                            ->label(function (Model $record) {
+                                $relatedModelClass = $record->approvable_type;
+                                $relatedModel = $relatedModelClass::find($record->approvable_id);
+
+                                if ($relatedModel) {
+                                    $approvableRelatedColumn = getApprovableRelatedColumnValue($relatedModel);
+                                    if ($approvableRelatedColumn){
+                                        return ucfirst($approvableRelatedColumn ?? 'Related Record');
+                                    }
+                                    $relatedModelKeys = array_keys($relatedModel->getAttributes());
+                                    $secondKey = $relatedModelKeys[1] ?? 'Related Record';
+                                    return ucfirst($secondKey);
+                                }
+
+                                return 'Related Record';
+                            })
+                            ->getStateUsing(function (Model $record) {
+                                $relatedModelClass = $record->approvable_type;
+                                $relatedModel = $relatedModelClass::find($record->approvable_id);
+                        
+                                if ($relatedModel) {
+                                    $approvableRelatedColumn = getApprovableRelatedColumnValue($relatedModel);
+                                    if ($approvableRelatedColumn){
+                                        return $relatedModel->{$approvableRelatedColumn} ?? 'Not Found';
+                                    }
+                                    $relatedModelKeys = array_keys($relatedModel->getAttributes());
+                                    $secondKey = $relatedModelKeys[1] ?? null;
+                                    return $secondKey ? $relatedModel->{$secondKey} : 'Not Found';
+                                }
+                        
+                                return 'Not Found';
+                            })
+                        ])
+                        ->visible(function ($record) {
+                            return $record->operation === 'Edit';
+                        }),
                 Section::make('Request Information')
                     ->columns(3)
                     ->schema([
@@ -149,7 +194,10 @@ class ApprovalResource extends Resource implements HasShieldPermissions
                                     })
                                     ->columnSpan(2),
                                 TextEntry::make('approvable_type')
-                                    ->label('Model'),
+                                    ->label('Resource')
+                                    ->formatStateUsing(function ($state) {
+                                        return class_basename($state);
+                                    }),
                                 TextEntry::make('user.name')
                                     ->label('Requested By'),
                                 TextEntry::make('operation'),
