@@ -15,10 +15,11 @@ class ListApprovals extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make('All Activities'),
+            'all' => Tab::make('All Approvals'),
             'approved' => Tab::make('Approved')
                 ->modifyQueryUsing(function ($query) {
-                    return $query->where('status', ApprovalStatus::APPROVED);
+                    return $query->where('status', ApprovalStatus::APPROVED)
+                    ->latest();
                 }),
             'submitted' => Tab::make('Submitted')
                 ->modifyQueryUsing(function ($query) {
@@ -26,7 +27,8 @@ class ListApprovals extends ListRecords
                 }),
             'rejected' => Tab::make('Rejected')
                 ->modifyQueryUsing(function ($query) {
-                    return $query->where('status', ApprovalStatus::REJECTED);
+                    return $query->where('status', ApprovalStatus::REJECTED)
+                    ->latest();
                 }),
         ];
     }
