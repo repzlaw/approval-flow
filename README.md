@@ -38,21 +38,29 @@ This is a Laravel-based project that implements an approval workflow system usin
     php artisan serve
     ```
 
-6. Add $approvable property to your models to determine which fields would not require approval:
+6. Use the trait on your filament resources pages e.g UserResource/CreateUser.php:
+    ```sh
+    use ApprovalFlow;
+    ```
+
+7. add this method on your create filament resources pages to redirect to your preferred route e.g UserResource/CreateUser.php:
+    ```sh
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+    ```
+
+8. (Optional) Add $approvable property to your models to determine which fields would not require approval:
     ```sh
     protected $approvable = [
         'email',
     ];
     ```
 
-7. Use the trait on your filament resources pages e.g UserResource/CreateUser.php:
-    ```sh
-    use ApprovalFlow;
-    ```
+9. Give approve permission to roles or users than can approve requests.
 
-8. Give approve permission to roles or users than can approve requests.
-
-9. Add $approvable_related_column property to your models to determine which field alongside the ID would be shown as related record:
+10. (Optional) Add $approvable_related_column property to your models to determine which field alongside the ID would be shown as related record:
     ```sh
     protected $approvable_related_column = 'name';
     ```
