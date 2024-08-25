@@ -196,7 +196,10 @@ class ApprovalResource extends Resource implements HasShieldPermissions
                                     ->visible(function ($record) {
                                         return $record->operation === 'Edit';
                                     })
-                                    ->columnSpan(2),
+                                    ->columnSpan(2)
+                                    ->extraAttributes([
+                                        'class' => 'mb-5',
+                                    ]),
                                 ViewEntry::make('data.new_relationships')
                                     ->label('New Relationship Data Details')
                                     ->columnSpan(2)
