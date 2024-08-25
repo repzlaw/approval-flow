@@ -64,6 +64,13 @@ This is a Laravel-based project that implements an approval workflow system usin
     ```sh
     protected $approvable_related_column = 'name';
     ```
+11. (Optional) Add $approvable_relationships property to your models to display details about your model relationships:
+    ```sh
+    protected $approvable_relationships = [
+        'department_id'   => 'App\Models\Department',
+        'jurisdiction_id' => 'App\Models\Jurisdiction',
+    ];
+    ```
 
 ## Usage
     Edit or Create a user and then approve or reject the request.
