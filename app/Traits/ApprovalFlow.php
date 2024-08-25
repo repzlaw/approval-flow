@@ -17,8 +17,36 @@ trait ApprovalFlow
             return static::getModel()::create($data);
         }
 
+        // get approvable relationships
+        $modelClass = static::getModel(); 
+        $model = new $modelClass(); 
+
+        $approvable_relationships = [];
+        $relationships = [];
+
+        if (property_exists($model, 'approvable_relationships')) {
+            $reflector = new ReflectionClass($model);
+            $property = $reflector->getProperty('approvable_relationships');
+            $property->setAccessible(true);
+            $approvable_relationships = $property->getValue($model);
+        }
+
+        foreach ($approvable_relationships as $foreignKey => $relatedModelClass) {
+            if (isset($data[$foreignKey]) && $data[$foreignKey] != null) {
+                $relatedRecord = $relatedModelClass::find($data[$foreignKey]);
+                if ($relatedRecord) {
+                    $recordData = $relatedRecord->toArray();
+                    $firstThreeKeys = array_slice($recordData, 0, 3, true);
+                    $relationships[$foreignKey] = $firstThreeKeys;
+                } else {
+                    $relationships[$foreignKey] = null;
+                }
+            }
+        }
+
         $array = [
             'new' => $data,
+            'new_relationships' => $relationships,
         ];
 
         return Approval::create([
@@ -54,7 +82,7 @@ trait ApprovalFlow
         $approvableData = [];
 
         foreach ($data as $key => $value) {
-            if (isset($original[$key]) && $original[$key] != $value) {
+            if (isset($original[$key]) || $original[$key] != $value) {
                 if (in_array($key, $approvable)) {
                     $approvableData[$key] = $value;
                 } else {
@@ -69,9 +97,61 @@ trait ApprovalFlow
         }
 
         if (!empty($newData)) {
+
+
+
+
+
+
+            // get approvable relationships
+            $modelClass = static::getModel(); 
+            $model = new $modelClass(); 
+
+            $approvable_relationships = [];
+            $oldRelationships = [];
+            $newRelationships = [];
+
+            if (property_exists($model, 'approvable_relationships')) {
+                $reflector = new ReflectionClass($model);
+                $property = $reflector->getProperty('approvable_relationships');
+                $property->setAccessible(true);
+                $approvable_relationships = $property->getValue($model);
+            }
+
+            foreach ($approvable_relationships as $foreignKey => $relatedModelClass) {
+
+                //old relationships
+                if (isset($oldData[$foreignKey]) && $oldData[$foreignKey] != null) {
+                    $oldRelatedRecord = $relatedModelClass::find($oldData[$foreignKey]);
+                    if ($oldRelatedRecord) {
+                        $oldRecordData = $oldRelatedRecord->toArray();
+                        $oldFirstThreeKeys = array_slice($oldRecordData, 0, 3, true);
+                        $oldRelationships[$foreignKey] = $oldFirstThreeKeys;
+                    } else {
+                        $oldRelationships[$foreignKey] = null;
+                    }
+                }
+
+                //new relationships
+                if (isset($newData[$foreignKey]) && $newData[$foreignKey] != null) {
+                    $newRelatedRecord = $relatedModelClass::find($newData[$foreignKey]);
+                    if ($newRelatedRecord) {
+                        $newRecordData = $newRelatedRecord->toArray();
+                        $newFirstThreeKeys = array_slice($newRecordData, 0, 3, true);
+                        $newRelationships[$foreignKey] = $newFirstThreeKeys;
+                    } else {
+                        $newRelationships[$foreignKey] = null;
+                    }
+                }
+
+                
+            }
+            
             $array = [
                 'old' => $oldData,
                 'new' => $newData,
+                'old_relationships' => $oldRelationships,
+                'new_relationships' => $newRelationships,
             ];
 
             return Approval::updateOrCreate(

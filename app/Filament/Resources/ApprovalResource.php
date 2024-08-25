@@ -10,15 +10,19 @@ use Filament\Tables\Table;
 use App\Enums\ApprovalStatus;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\KeyValue;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Infolists\Components\Group;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use App\Filament\Resources\ApprovalResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Infolists\Components\ApprovableRelationships;
 use App\Filament\Resources\ApprovalResource\RelationManagers;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
@@ -193,6 +197,22 @@ class ApprovalResource extends Resource implements HasShieldPermissions
                                         return $record->operation === 'Edit';
                                     })
                                     ->columnSpan(2),
+                                ViewEntry::make('data.new_relationships')
+                                    ->label('New Relationship Data Details')
+                                    ->columnSpan(2)
+                                    ->visible(function ($record) {
+                                        return (!empty($record->data['new_relationships']));
+                                    })
+                                    ->view('infolists.components.new-approvable-relationships'),
+                                ViewEntry::make('data.old_relationships')
+                                    ->label('Old Relationship Data Details')
+                                    ->columnSpan(2)
+                                    ->visible(function ($record) {
+                                        return (!empty($record->data['old_relationships'])
+                                            && $record->operation === 'Edit'
+                                        );
+                                    })
+                                    ->view('infolists.components.old-approvable-relationships'),
                                 TextEntry::make('approvable_type')
                                     ->label('Resource')
                                     ->formatStateUsing(function ($state) {
