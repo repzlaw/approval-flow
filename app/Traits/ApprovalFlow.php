@@ -36,7 +36,7 @@ trait ApprovalFlow
                 $relatedRecord = $relatedModelClass::find($data[$foreignKey]);
                 if ($relatedRecord) {
                     $recordData = $relatedRecord->toArray();
-                    $firstThreeKeys = array_slice($recordData, 0, 3, true);
+                    $firstThreeKeys = array_slice($recordData, 0, 2, true);
                     $relationships[$foreignKey] = $firstThreeKeys;
                 } else {
                     $relationships[$foreignKey] = null;
@@ -82,7 +82,7 @@ trait ApprovalFlow
         $approvableData = [];
 
         foreach ($data as $key => $value) {
-            if (isset($original[$key]) || $original[$key] != $value) {
+            if (isset($original[$key]) && $original[$key] != $value) {
                 if (in_array($key, $approvable)) {
                     $approvableData[$key] = $value;
                 } else {
@@ -97,11 +97,6 @@ trait ApprovalFlow
         }
 
         if (!empty($newData)) {
-
-
-
-
-
 
             // get approvable relationships
             $modelClass = static::getModel(); 
@@ -125,7 +120,7 @@ trait ApprovalFlow
                     $oldRelatedRecord = $relatedModelClass::find($oldData[$foreignKey]);
                     if ($oldRelatedRecord) {
                         $oldRecordData = $oldRelatedRecord->toArray();
-                        $oldFirstThreeKeys = array_slice($oldRecordData, 0, 3, true);
+                        $oldFirstThreeKeys = array_slice($oldRecordData, 0, 2, true);
                         $oldRelationships[$foreignKey] = $oldFirstThreeKeys;
                     } else {
                         $oldRelationships[$foreignKey] = null;
@@ -137,7 +132,7 @@ trait ApprovalFlow
                     $newRelatedRecord = $relatedModelClass::find($newData[$foreignKey]);
                     if ($newRelatedRecord) {
                         $newRecordData = $newRelatedRecord->toArray();
-                        $newFirstThreeKeys = array_slice($newRecordData, 0, 3, true);
+                        $newFirstThreeKeys = array_slice($newRecordData, 0, 2, true);
                         $newRelationships[$foreignKey] = $newFirstThreeKeys;
                     } else {
                         $newRelationships[$foreignKey] = null;

@@ -19,7 +19,7 @@ class ListApprovals extends ListRecords
             'approved' => Tab::make('Approved')
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('status', ApprovalStatus::APPROVED)
-                    ->latest();
+                    ->latest('approve_date');
                 }),
             'submitted' => Tab::make('Submitted')
                 ->modifyQueryUsing(function ($query) {
@@ -28,7 +28,7 @@ class ListApprovals extends ListRecords
             'rejected' => Tab::make('Rejected')
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('status', ApprovalStatus::REJECTED)
-                    ->latest();
+                    ->latest('approve_date');
                 }),
         ];
     }

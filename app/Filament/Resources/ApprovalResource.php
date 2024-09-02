@@ -19,8 +19,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
+use App\Infolists\Components\ApprovalDataTable;
 use Filament\Infolists\Components\KeyValueEntry;
 use App\Filament\Resources\ApprovalResource\Pages;
+use App\Infolists\Components\ApprovalRelationship;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Infolists\Components\ApprovableRelationships;
 use App\Filament\Resources\ApprovalResource\RelationManagers;
@@ -188,34 +190,43 @@ class ApprovalResource extends Resource implements HasShieldPermissions
                             ->columnSpan(3)
                             ->columns(2)
                             ->schema([
-                                KeyValueEntry::make('data.new')
-                                    ->label('New Data')
+                                // KeyValueEntry::make('data.new')
+                                //     ->label('New Data')
+                                //     ->columnSpan(2),
+                                // KeyValueEntry::make('data.old')
+                                //     ->label('Old Data')
+                                //     ->visible(function ($record) {
+                                //         return $record->operation === 'Edit';
+                                //     })
+                                //     ->columnSpan(2)
+                                //     ->extraAttributes([
+                                //         'class' => 'mb-5',
+                                //     ]),
+                                ApprovalDataTable::make('data')
+                                    ->label('Data')
                                     ->columnSpan(2),
-                                KeyValueEntry::make('data.old')
-                                    ->label('Old Data')
-                                    ->visible(function ($record) {
-                                        return $record->operation === 'Edit';
-                                    })
-                                    ->columnSpan(2)
-                                    ->extraAttributes([
-                                        'class' => 'mb-5',
-                                    ]),
-                                ViewEntry::make('data.new_relationships')
-                                    ->label('New Relationship Data Details')
+                                ApprovalRelationship::make('data')
+                                    ->label('Relationship Data')
                                     ->columnSpan(2)
                                     ->visible(function ($record) {
                                         return (!empty($record->data['new_relationships']));
-                                    })
-                                    ->view('infolists.components.new-approvable-relationships'),
-                                ViewEntry::make('data.old_relationships')
-                                    ->label('Old Relationship Data Details')
-                                    ->columnSpan(2)
-                                    ->visible(function ($record) {
-                                        return (!empty($record->data['old_relationships'])
-                                            && $record->operation === 'Edit'
-                                        );
-                                    })
-                                    ->view('infolists.components.old-approvable-relationships'),
+                                    }),
+                                // ViewEntry::make('data.new_relationships')
+                                //     ->label('New Relationship Data Details')
+                                //     ->columnSpan(2)
+                                //     ->visible(function ($record) {
+                                //         return (!empty($record->data['new_relationships']));
+                                //     })
+                                //     ->view('infolists.components.new-approvable-relationships'),
+                                // ViewEntry::make('data.old_relationships')
+                                //     ->label('Old Relationship Data Details')
+                                //     ->columnSpan(2)
+                                //     ->visible(function ($record) {
+                                //         return (!empty($record->data['old_relationships'])
+                                //             && $record->operation === 'Edit'
+                                //         );
+                                //     })
+                                //     ->view('infolists.components.old-approvable-relationships'),
                                 TextEntry::make('approvable_type')
                                     ->label('Resource')
                                     ->formatStateUsing(function ($state) {
@@ -240,6 +251,9 @@ class ApprovalResource extends Resource implements HasShieldPermissions
                                 TextEntry::make('approver_comment')
                                     ->columnSpan(2),
                         ])
+                        ->visible(function ($record) {
+                            return $record->approver_id;
+                        })
             ]);
     }
     

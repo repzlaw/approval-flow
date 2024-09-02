@@ -27,7 +27,7 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     protected $approvable = [
-        'email',
+        'password',
     ];
 
     protected $approvable_related_column = 'name';
