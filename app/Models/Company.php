@@ -15,10 +15,10 @@ class Company extends Model
         'jurisdiction_id',
     ];
 
-    // protected $approvable_relationships = [
-    //     'department_id'   => 'App\Models\Department',
-    //     'jurisdiction_id' => 'App\Models\Jurisdiction',
-    // ];
+    protected $approvable_relationships = [
+        'department_id'   => 'App\Models\Department',
+        'jurisdiction_id' => 'App\Models\Jurisdiction',
+    ];
 
     public function department()
     {

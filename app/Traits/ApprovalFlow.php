@@ -132,8 +132,8 @@ trait ApprovalFlow
                     $newRelatedRecord = $relatedModelClass::find($newData[$foreignKey]);
                     if ($newRelatedRecord) {
                         $newRecordData = $newRelatedRecord->toArray();
-                        $newFirstThreeKeys = array_slice($newRecordData, 0, 2, true);
-                        $newRelationships[$foreignKey] = $newFirstThreeKeys;
+                        $newFirstTwoKeys = array_slice($newRecordData, 0, 2, true);
+                        $newRelationships[$foreignKey] = $newFirstTwoKeys;
                     } else {
                         $newRelationships[$foreignKey] = null;
                     }
