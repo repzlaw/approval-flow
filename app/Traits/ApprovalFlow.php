@@ -36,7 +36,7 @@ trait ApprovalFlow
                 $relatedRecord = $relatedModelClass::find($data[$foreignKey]);
                 if ($relatedRecord) {
                     $recordData = $relatedRecord->toArray();
-                    $firstThreeKeys = array_slice($recordData, 0, 2, true);
+                    $firstThreeKeys = array_slice($recordData, 1, 1, true);
                     $relationships[$foreignKey] = $firstThreeKeys;
                 } else {
                     $relationships[$foreignKey] = null;
@@ -120,8 +120,8 @@ trait ApprovalFlow
                     $oldRelatedRecord = $relatedModelClass::find($oldData[$foreignKey]);
                     if ($oldRelatedRecord) {
                         $oldRecordData = $oldRelatedRecord->toArray();
-                        $oldFirstThreeKeys = array_slice($oldRecordData, 0, 2, true);
-                        $oldRelationships[$foreignKey] = $oldFirstThreeKeys;
+                        $oldKey = array_slice($oldRecordData, 1, 1, true);
+                        $oldRelationships[$foreignKey] = $oldKey;
                     } else {
                         $oldRelationships[$foreignKey] = null;
                     }
@@ -132,8 +132,8 @@ trait ApprovalFlow
                     $newRelatedRecord = $relatedModelClass::find($newData[$foreignKey]);
                     if ($newRelatedRecord) {
                         $newRecordData = $newRelatedRecord->toArray();
-                        $newFirstTwoKeys = array_slice($newRecordData, 0, 2, true);
-                        $newRelationships[$foreignKey] = $newFirstTwoKeys;
+                        $newKey = array_slice($newRecordData, 1, 1, true);
+                        $newRelationships[$foreignKey] = $newKey;
                     } else {
                         $newRelationships[$foreignKey] = null;
                     }

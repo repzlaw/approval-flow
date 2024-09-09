@@ -22,40 +22,34 @@
                         @endif
                     </tr>
                     @if(isset($data->data['new']))
-                    @foreach ($data->data['new'] as $key => $value)
-                        <tr class="divide-x divide-gray-200 dark:divide-white/5 rtl:divide-x-reverse">
-                            <td class="w-1/3 px-3 py-1.5">
-                                {{ ucfirst($key) }}
-                            </td>
-    
-                            <td class="w-1/3 px-3 py-1.5"
-                            style="word-wrap: break-word; overflow-wrap: break-word; 
-                            text-overflow: ellipsis; white-space: normal; word-break: break-all;">
-                                {{ $value }}
-                            </td>
-                            @if($data->operation == 'Edit')
-                            <td class="w-1/3 px-3 py-1.5"
-                            style="word-wrap: break-word; overflow-wrap: break-word; 
-                            text-overflow: ellipsis; white-space: normal; word-break: break-all;">
-                                {{ $oldRecord->{$key} ?? '' }}
-                            </td>
-                            @endif
-                        </tr>
-                    @endforeach
-
-                        {{-- @if (!empty($attributes))
-                            @foreach ($attributes as $key => $value)
-                                <tr class="divide-x divide-gray-200 dark:divide-white/5 rtl:divide-x-reverse">
-                                    <td class="w-1/2 px-3 py-1.5">
-                                        {{ ucfirst($key) }}
-                                    </td>
-            
-                                    <td class="w-1/2 px-3 py-1.5">
-                                        {{ $value }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif --}}
+                        @foreach ($data->data['new'] as $key => $value)
+                            <tr class="divide-x divide-gray-200 dark:divide-white/5 rtl:divide-x-reverse">
+                                <td class="w-1/3 px-3 py-1.5">
+                                    {{ ucfirst($key) }}
+                                </td>
+        
+                                <td class="w-1/3 px-3 py-1.5"
+                                style="word-wrap: break-word; overflow-wrap: break-word; 
+                                text-overflow: ellipsis; white-space: normal; word-break: break-all;">
+                                    {{ $value }}
+                                </td>
+                                @if($data->operation == 'Edit')
+                                    @if($data->status->value == 'Approved')
+                                        <td class="w-1/3 px-3 py-1.5"
+                                        style="word-wrap: break-word; overflow-wrap: break-word; 
+                                        text-overflow: ellipsis; white-space: normal; word-break: break-all;">
+                                            {{ $data->data['old'][$key] ?? '' }}
+                                        </td>
+                                    @else
+                                        <td class="w-1/3 px-3 py-1.5"
+                                        style="word-wrap: break-word; overflow-wrap: break-word; 
+                                        text-overflow: ellipsis; white-space: normal; word-break: break-all;">
+                                            {{ $oldRecord->{$key} ?? '' }}
+                                        </td>
+                                    @endif
+                                @endif
+                            </tr>
+                        @endforeach
                     @endif
                 </tbody>
             </table>
