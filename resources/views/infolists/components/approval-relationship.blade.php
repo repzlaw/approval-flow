@@ -21,14 +21,14 @@
                     <tbody class="divide-y divide-gray-200 font-mono text-base dark:divide-white/5 sm:text-sm sm:leading-6">
                         <tr class="divide-x divide-gray-200 dark:divide-white/5 rtl:divide-x-reverse">
                             <td class="w-1/3 px-3 py-1.5 font-bold">
-                                Key
+                                Field
                             </td>
                             <td class="w-1/3 px-3 py-1.5 font-bold">
                                 New Value
                             </td>
                             @if($data->operation == 'Edit')
                             <td class="w-1/3 px-3 py-1.5 font-bold">
-                                Old Value
+                                Current Value
                             </td>
                             @endif
                         </tr>
